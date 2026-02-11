@@ -8,10 +8,13 @@
 <style>
 *{box-sizing:border-box}
 html,body{
-  margin:0;height:100%;overflow:hidden;
+  margin:0;height:100%;
   font-family:system-ui,Segoe UI,Roboto;
   background:#f1f5f9;
 }
+body{overflow:hidden}
+
+/* APP WRAPPER */
 .app{
   display:flex;
   flex-direction:column;
@@ -20,11 +23,12 @@ html,body{
   gap:12px;
 }
 
-/* MENU */
+/* MENU (TIDAK SCROLL) */
 .menu{
   display:flex;
   flex-direction:column;
   gap:12px;
+  flex-shrink:0;
 }
 .menu-card{
   padding:18px;
@@ -33,27 +37,32 @@ html,body{
   font-weight:800;
   display:flex;
   justify-content:space-between;
+  text-decoration:none;
 }
 .blue{background:linear-gradient(135deg,#2563eb,#3b82f6)}
 .orange{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
 .green{background:linear-gradient(135deg,#16a34a,#22c55e)}
 .gray{background:linear-gradient(135deg,#475569,#64748b)}
 .wa{background:linear-gradient(135deg,#25D366,#1ebe57)}
-
 .menu span{font-size:12px;font-weight:600}
 
-/* SEARCH */
+/* SEARCH (TIDAK SCROLL) */
+.search{
+  flex-shrink:0;
+}
 .search input{
   width:100%;
   padding:16px;
   border-radius:18px;
   border:1px solid #e5e7eb;
+  font-size:15px;
 }
 
-/* LIST */
+/* LIST (YANG BOLEH SCROLL) */
 .list-area{
   flex:1;
   overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
 .card{
   background:#fff;
@@ -84,19 +93,23 @@ html,body{
 
   <!-- MENU -->
   <div class="menu">
-    <a class="menu-card blue" href="LINK_PERSYARATAN" target="_blank">
+    <a class="menu-card blue" href="https://drive.google.com/file/d/1CvrZiZnmdudPrlsr6ISvy7tFo1V3OvMz/view" target="_blank">
       <div>📄 Persyaratan<br><span>Lihat dokumen</span></div><div>STEP 1</div>
     </a>
-    <a class="menu-card orange" href="LINK_SURAT_ATASAN" target="_blank">
+
+    <a class="menu-card orange" href="https://script.google.com/macros/s/AKfycbyT3KVZDSY14mBx1b2da3M72m2Sx-xiIm1jnao4NweL0TP8tH36TquO9DIZK1IwTN55/exec" target="_blank">
       <div>📝 Surat Ket Atasan<br><span>Buat surat</span></div><div>STEP 2</div>
     </a>
+
     <div class="menu-card green">
       <div>➕ Ajukan Rekom OPD<br><span>Upload berkas</span></div><div>STEP 3</div>
     </div>
-    <a class="menu-card gray" href="LINK_BKD" target="_blank">
+
+    <a class="menu-card gray" href="https://www.pengadaanmutasiasnbkdkalbar.com" target="_blank">
       <div>🔗 Link BKD<br><span>Isi setelah rekom</span></div><div>STEP 4</div>
     </a>
-    <a class="menu-card wa" href="LINK_WA" target="_blank">
+
+    <a class="menu-card wa" href="https://chat.whatsapp.com/GCBj3rAgQ2H1O5mdV30cXr" target="_blank">
       <div>💬 Group WhatsApp<br><span>Informasi</span></div><div>JOIN</div>
     </a>
   </div>
@@ -112,33 +125,53 @@ html,body{
 </div>
 
 <script>
-const API_URL = 'URL_WEB_APP_GAS_ANDA';
-let all=[];
+/* ===== KONFIG ===== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzoaS6WS-r5YlugXokmmViPq7dpuR2u9DwxnS1wMsXeVbKql5kL4He_h7SMQKHT9FH/exec?mode=json';
 
+let allData = [];
+
+/* RENDER CARD */
 function render(data){
-  const box=document.getElementById('list');
-  box.innerHTML='';
+  const box = document.getElementById('list');
+  box.innerHTML = '';
+
+  if (!data.length){
+    box.innerHTML = '<div class="card muted">Data tidak ditemukan</div>';
+    return;
+  }
+
   data.forEach(r=>{
-    box.innerHTML+=`
+    box.innerHTML += `
       <div class="card">
         <div class="name">${r.Nama}</div>
         <div class="nip">${r.NIP}</div>
         <div class="row"><b>Periode:</b> ${r.Periode}</div>
-        <div class="row"><b>Catatan:</b> <span class="muted">${r.Catatan||'-'}</span></div>
-        ${r.FolderUrl?`<a class="btn" href="${r.FolderUrl}" target="_blank">📁 Buka Folder</a>`:''}
-        ${r.RekomUrl?`<a class="btn" href="${r.RekomUrl}" target="_blank">📄 Buka Rekom</a>`:''}
-      </div>`;
+        <div class="row"><b>Catatan:</b> <span class="muted">${r.Catatan || '-'}</span></div>
+        ${r.FolderUrl ? `<a class="btn" href="${r.FolderUrl}" target="_blank">📁 Buka Folder</a>` : ``}
+        ${r.RekomUrl ? `<a class="btn" href="${r.RekomUrl}" target="_blank">📄 Buka Rekom</a>` : ``}
+      </div>
+    `;
   });
 }
 
+/* LOAD DATA */
 fetch(API_URL)
-  .then(r=>r.json())
-  .then(d=>{ all=d; render(all); });
+  .then(r => r.json())
+  .then(d => {
+    allData = d || [];
+    render(allData);
+  })
+  .catch(() => {
+    document.getElementById('list').innerHTML =
+      '<div class="card muted">Gagal memuat data</div>';
+  });
 
-document.getElementById('search').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase();
-  render(all.filter(r=>r.Nama.toLowerCase().includes(q)));
+/* SEARCH */
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  render(allData.filter(r => r.Nama.toLowerCase().includes(q)));
 });
 </script>
+
 </body>
 </html>
