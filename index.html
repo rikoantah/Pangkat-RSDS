@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KENAIKAN PANGKAT 2026</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;height:100%;overflow:hidden;
+  font-family:system-ui,Segoe UI,Roboto;
+  background:#f1f5f9;
+}
+.app{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  padding:12px;
+  gap:12px;
+}
+
+/* MENU */
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.menu-card{
+  padding:18px;
+  border-radius:20px;
+  color:#fff;
+  font-weight:800;
+  display:flex;
+  justify-content:space-between;
+}
+.blue{background:linear-gradient(135deg,#2563eb,#3b82f6)}
+.orange{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.gray{background:linear-gradient(135deg,#475569,#64748b)}
+.wa{background:linear-gradient(135deg,#25D366,#1ebe57)}
+
+.menu span{font-size:12px;font-weight:600}
+
+/* SEARCH */
+.search input{
+  width:100%;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid #e5e7eb;
+}
+
+/* LIST */
+.list-area{
+  flex:1;
+  overflow-y:auto;
+}
+.card{
+  background:#fff;
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:14px;
+}
+.name{font-size:17px;font-weight:900}
+.nip{font-size:13px;color:#64748b}
+.row{margin-top:8px;font-size:14px}
+.btn{
+  display:block;
+  margin-top:10px;
+  padding:14px;
+  background:#2563eb;
+  color:#fff;
+  text-align:center;
+  border-radius:16px;
+  font-weight:800;
+  text-decoration:none;
+}
+.muted{color:#64748b;font-size:13px}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- MENU -->
+  <div class="menu">
+    <a class="menu-card blue" href="LINK_PERSYARATAN" target="_blank">
+      <div>📄 Persyaratan<br><span>Lihat dokumen</span></div><div>STEP 1</div>
+    </a>
+    <a class="menu-card orange" href="LINK_SURAT_ATASAN" target="_blank">
+      <div>📝 Surat Ket Atasan<br><span>Buat surat</span></div><div>STEP 2</div>
+    </a>
+    <div class="menu-card green">
+      <div>➕ Ajukan Rekom OPD<br><span>Upload berkas</span></div><div>STEP 3</div>
+    </div>
+    <a class="menu-card gray" href="LINK_BKD" target="_blank">
+      <div>🔗 Link BKD<br><span>Isi setelah rekom</span></div><div>STEP 4</div>
+    </a>
+    <a class="menu-card wa" href="LINK_WA" target="_blank">
+      <div>💬 Group WhatsApp<br><span>Informasi</span></div><div>JOIN</div>
+    </a>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search">
+    <input id="search" placeholder="🔍 Ketik nama pegawai">
+  </div>
+
+  <!-- LIST -->
+  <div id="list" class="list-area"></div>
+
+</div>
+
+<script>
+const API_URL = 'URL_WEB_APP_GAS_ANDA';
+let all=[];
+
+function render(data){
+  const box=document.getElementById('list');
+  box.innerHTML='';
+  data.forEach(r=>{
+    box.innerHTML+=`
+      <div class="card">
+        <div class="name">${r.Nama}</div>
+        <div class="nip">${r.NIP}</div>
+        <div class="row"><b>Periode:</b> ${r.Periode}</div>
+        <div class="row"><b>Catatan:</b> <span class="muted">${r.Catatan||'-'}</span></div>
+        ${r.FolderUrl?`<a class="btn" href="${r.FolderUrl}" target="_blank">📁 Buka Folder</a>`:''}
+        ${r.RekomUrl?`<a class="btn" href="${r.RekomUrl}" target="_blank">📄 Buka Rekom</a>`:''}
+      </div>`;
+  });
+}
+
+fetch(API_URL)
+  .then(r=>r.json())
+  .then(d=>{ all=d; render(all); });
+
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  render(all.filter(r=>r.Nama.toLowerCase().includes(q)));
+});
+</script>
+</body>
+</html>
