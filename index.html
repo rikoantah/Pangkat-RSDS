@@ -14,7 +14,6 @@ html,body{
 }
 body{overflow:hidden}
 
-/* APP WRAPPER */
 .app{
   display:flex;
   flex-direction:column;
@@ -23,7 +22,7 @@ body{overflow:hidden}
   gap:12px;
 }
 
-/* MENU (TIDAK SCROLL) */
+/* MENU */
 .menu{
   display:flex;
   flex-direction:column;
@@ -46,10 +45,8 @@ body{overflow:hidden}
 .wa{background:linear-gradient(135deg,#25D366,#1ebe57)}
 .menu span{font-size:12px;font-weight:600}
 
-/* SEARCH (TIDAK SCROLL) */
-.search{
-  flex-shrink:0;
-}
+/* SEARCH */
+.search{flex-shrink:0}
 .search input{
   width:100%;
   padding:16px;
@@ -58,7 +55,7 @@ body{overflow:hidden}
   font-size:15px;
 }
 
-/* LIST (YANG BOLEH SCROLL) */
+/* LIST */
 .list-area{
   flex:1;
   overflow-y:auto;
@@ -125,12 +122,13 @@ body{overflow:hidden}
 </div>
 
 <script>
-/* ===== KONFIG ===== */
-const API_URL = 'https://script.google.com/macros/s/AKfycbzoaS6WS-r5YlugXokmmViPq7dpuR2u9DwxnS1wMsXeVbKql5kL4He_h7SMQKHT9FH/exec?mode=json';
+/* ===== KONFIG API (WAJIB BENAR) ===== */
+const API_URL =
+  'https://script.google.com/macros/s/AKfycbwUC6omUMDbrQrkVvouKXcowKcXFGI2HKJwFpq3l8tqN0RzRRP0QV18RJlR9moiNEKm/exec?mode=json';
 
 let allData = [];
 
-/* RENDER CARD */
+/* RENDER */
 function render(data){
   const box = document.getElementById('list');
   box.innerHTML = '';
@@ -155,13 +153,14 @@ function render(data){
 }
 
 /* LOAD DATA */
-fetch(https://script.google.com/macros/s/AKfycbwUC6omUMDbrQrkVvouKXcowKcXFGI2HKJwFpq3l8tqN0RzRRP0QV18RJlR9moiNEKm/exec)
+fetch(API_URL)
   .then(r => r.json())
   .then(d => {
-    allData = d || [];
+    allData = Array.isArray(d) ? d : [];
     render(allData);
   })
-  .catch(() => {
+  .catch(err => {
+    console.error(err);
     document.getElementById('list').innerHTML =
       '<div class="card muted">Gagal memuat data</div>';
   });
